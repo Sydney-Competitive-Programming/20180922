@@ -1,0 +1,20 @@
+# Problem 1
+
+A recent paper (https://arxiv.org/abs/1602.06208) has shown that "every positive integer can be written as the sum of 3 palindrome integers". E.g. 3141592 = 2200022 + 926629 + 14941 and 105 = 101 + 3 + 1. For an integers k < 1m, 10m, 100m, one can find the sum of the largest palindrome compoenent.
+
+
+# Problem 2
+
+For a given sentence (alphabetical characters, separated by spaces) reorder the sentence to be in alphabetical order.
+
+As an example, `Hi there! How are you doing?` will return the ordered sentence `are doing? Hi How there you`
+
+You will be given a text file (to be constructed) of sentences, separated by new lines, and you will be expected to write _back_ to a text file with your solutions. (edited)
+
+# Problem 3
+
+Build an API where we coded up solutions can be POSTed, as plain text, up into a database. These posted solutions will then be accessible through a public URL where we can view the solutions.
+
+As an example, the posted URL could be of the format `<public url>/<date>/<problem number>/<integer counter of solution>/`.
+
+Be as creative as you like in building a solution! Either simply try to build the API, or try to win on either execution time or code golf.
