@@ -1,76 +1,54 @@
 using Base.Iterators
 
-add_digit(n, add_orig = false) = begin
-    ndigit = maximum(ndigits, n)
-    res = vec([a + b for (a,b) in product((1:9) .* 10^(ndigit+1) .+ (1:9), n*10)])
-    if add_orig
-        res = vcat(n,res)
-    end
-    res
+is_palindrome(n) = begin
+    dn = digits(n)
+    all(dn .== reverse(dn))
 end
 
-ndigit_palindromes(ndigit) = begin
-    if ndigit == 1
-        return([0:9...])
-    elseif ndigit == 2
-        return( [1:9...] .* 10 .+ [1:9...])
-    else
-        starting = [0:9...]
-        digit_so_far = 2
-        if iseven(ndigit)
-            starting = [0,ndigit_palindromes(2)...]
-            digit_so_far = 3
-        end
+lim  = Int64(1e6)
+res = filter(is_palindrome,lim:-1:0)
 
-        loopto = div(ndigit-1,2)
-        for i in 1:loopto
-            starting = add_digit(starting, true)
-        end
-        return(starting)
-    end
-end
-
-gen(nm) = begin
-    res = ndigit_palindromes(1)
-    for j in 2:nm
-        res = vcat(res, ndigit_palindromes(j)) |> unique
-    end
-    res
-end
-
-res = sort(gen(7), rev = true)
-lim  = Int64(1e7)
+using DataFrames
+lp = DataFrame(k = 1:1_000_000, largest_palindrome = Array{Int64,1}(lim))
 
 # found stores the integers backwardds
-ok(lim, res) = begin
-    found = Array{Bool,1}(lim)
+ok(lim, res, lp) = begin
+    found = BitArray(lim)
     found .= false
     tot = Int128(0)
 
     cap = lim
+    r = res[1]
 
     for r in res[1:end-1]
-        #sprintln(r)
-        a = res[res .<= (cap - r)]
-        res1 = vec([r + b + c for (b,  c) in product(a,a)])
+        bs = res[res .<= (cap - r)]
+        cs = res[res .<= ceil((cap - r)/2)]
+
+        res1 = vec([r + b + c for (b,  c) in product(bs,cs)])
+
         res1 = res1[res1 .<= cap]
 
         for rr in res1
             if !found[rr]
+                lp[rr,:largest_palindrome] = r
                 tot = tot + r
                 found[rr] = true
             end
         end
 
-        cap  = findfirst(found) - 1
-        #println(tot)
+        for i in lim:-1:1
+            if !found[i]
+                cap = i
+                break
+            end
+        end
     end
 
-    tot
+    (tot, found, lp)
 end
-
-@time hehe = ok(lim, res)
-@time hehe = ok(lim, res)
 
 using BenchmarkTools
 @benchmark ok(lim, res)
+
+using CSVFiles
+save("zj/integer_largest_palin_pair.csv",lp)
